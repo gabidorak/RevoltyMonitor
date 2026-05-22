@@ -79,9 +79,9 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-white">Tableau de bord</h1>
           <p className="text-gray-400 text-sm mt-0.5">
-            {devices.length} device{devices.length !== 1 ? "s" : ""} registered
+            {devices.length} appareil{devices.length !== 1 ? "s" : ""} enregistré{devices.length !== 1 ? "s" : ""}
           </p>
         </div>
         <Link
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Add Device
+          Ajouter un appareil
         </Link>
       </div>
 
@@ -103,13 +103,13 @@ export default async function DashboardPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
               d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
           </svg>
-          <p className="text-gray-400">No devices yet.</p>
+          <p className="text-gray-400">Aucun appareil pour le moment.</p>
           <p className="text-gray-500 text-sm mt-1">
-            Go to{" "}
+            Allez dans{" "}
             <Link href="/devices" className="text-green-400 hover:underline">
-              Devices
+              Appareils
             </Link>{" "}
-            to create your first device and get an API key.
+            pour créer votre premier appareil et obtenir une clé API.
           </p>
         </div>
       ) : (
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
                       </h2>
                     </div>
                     <p className="text-xs text-gray-500">
-                      {device.location || "No location"} •{" "}
+                      {device.location || "Aucun emplacement"} •{" "}
                       {device._count.snapshots.toLocaleString()} snapshots
                     </p>
                   </div>
@@ -155,7 +155,7 @@ export default async function DashboardPage() {
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                       </svg>
-                      Alarm
+                      Alarme
                     </span>
                   )}
                 </div>
@@ -176,18 +176,18 @@ export default async function DashboardPage() {
                       }
                     />
                     <MetricCard
-                      label="Voltage"
+                      label="Tension"
                       value={snap.voltage.toFixed(2)}
                       unit="V"
                     />
                     <MetricCard
-                      label="Power"
+                      label="Puissance"
                       value={snap.power.toFixed(0)}
                       unit="W"
                       color={snap.power >= 0 ? "text-green-400" : "text-orange-400"}
                     />
                     <MetricCard
-                      label="Cell Δ"
+                      label="Δ Cellules"
                       value={
                         snap.cellVoltageDelta != null
                           ? (snap.cellVoltageDelta * 1000).toFixed(0)
@@ -213,14 +213,14 @@ export default async function DashboardPage() {
                     />
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm py-4 text-center">No data yet</p>
+                  <p className="text-gray-500 text-sm py-4 text-center">Pas encore de données</p>
                 )}
 
                 {/* Last seen */}
                 <div className="mt-4 pt-3 border-t border-gray-800 text-xs text-gray-500">
                   {snap
-                    ? `Last data: ${formatDistanceToNow(new Date(snap.timestamp), { addSuffix: true })}`
-                    : "Never seen"}
+                    ? `Dernières données : ${formatDistanceToNow(new Date(snap.timestamp), { addSuffix: true })}`
+                    : "Jamais vu"}
                 </div>
               </Link>
             );

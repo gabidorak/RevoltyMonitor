@@ -213,9 +213,9 @@ export default function DeviceDetailPage() {
 
       if (dataJson.success) setChartData(dataJson.data.data || []);
       if (statsJson.success) setStats(statsJson.data);
-      else setError(statsJson.error || "Failed to load stats");
+      else setError(statsJson.error || "Échec du chargement des statistiques");
     } catch {
-      setError("Network error");
+      setError("Erreur réseau");
     } finally {
       setLoading(false);
     }
@@ -251,7 +251,7 @@ export default function DeviceDetailPage() {
           onClick={() => router.back()}
           className="mt-3 text-sm text-gray-400 hover:text-white"
         >
-          ← Back
+          ← Retour
         </button>
       </div>
     );
@@ -269,13 +269,13 @@ export default function DeviceDetailPage() {
             Dashboard
           </Link>
           <h1 className="text-2xl font-bold text-white">
-            {stats?.device.name ?? "Loading..."}
+            {stats?.device.name ?? "Chargement..."}
           </h1>
           {stats?.device && (
             <p className="text-gray-400 text-sm mt-0.5">
               {stats.device.location && `${stats.device.location} · `}
               {stats.device.serial && `S/N: ${stats.device.serial} · `}
-              {stats.totalSnapshots.toLocaleString()} total snapshots
+              {stats.totalSnapshots.toLocaleString()} snapshots au total
             </p>
           )}
         </div>

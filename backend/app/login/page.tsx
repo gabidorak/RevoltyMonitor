@@ -27,10 +27,10 @@ export default function LoginPage() {
       if (data.success) {
         router.push("/dashboard");
       } else {
-        setError(data.error || "Login failed");
+        setError(data.error || "Échec de connexion");
       }
     } catch {
-      setError("Network error. Please try again.");
+      setError("Erreur réseau. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -48,14 +48,14 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white">RevoltyMonitor</h1>
-          <p className="text-gray-400 text-sm mt-1">Battery analytics platform</p>
+          <p className="text-gray-400 text-sm mt-1">Plateforme d&apos;analyse batterie</p>
         </div>
 
         {/* Login card */}
         <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">
-              Username
+              Nom d&apos;utilisateur
             </label>
             <input
               type="text"
@@ -72,7 +72,7 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">
-              Password
+              Mot de passe
             </label>
             <input
               type="password"
@@ -110,10 +110,10 @@ export default function LoginPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Signing in...
+                Connexion...
               </span>
             ) : (
-              "Sign in"
+              "Se connecter"
             )}
           </button>
         </form>

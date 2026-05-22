@@ -39,7 +39,7 @@ function CopyButton({ text }: { text: string }) {
           <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
-          Copied!
+          Copié !
         </>
       ) : (
         <>
@@ -47,7 +47,7 @@ function CopyButton({ text }: { text: string }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
-          Copy
+          Copier
         </>
       )}
     </button>
@@ -70,7 +70,7 @@ export default function DevicesPage() {
       const data = await res.json();
       if (data.success) setDevices(data.data);
     } catch {
-      setError("Failed to load devices");
+      setError("Échec du chargement des appareils");
     } finally {
       setLoading(false);
     }
@@ -96,10 +96,10 @@ export default function DevicesPage() {
         setNewDevice({ name: "", description: "", location: "" });
         fetchDevices();
       } else {
-        setError(data.error || "Failed to create device");
+        setError(data.error || "Échec de la création de l'appareil");
       }
     } catch {
-      setError("Network error");
+      setError("Erreur réseau");
     } finally {
       setCreating(false);
     }
@@ -116,10 +116,10 @@ export default function DevicesPage() {
         setDevices((prev) => prev.filter((d) => d.id !== id));
         setDeleteConfirm(null);
       } else {
-        setError(data.error || "Failed to delete");
+        setError(data.error || "Échec de la suppression");
       }
     } catch {
-      setError("Network error");
+      setError("Erreur réseau");
     }
   };
 
@@ -138,12 +138,12 @@ export default function DevicesPage() {
         );
       }
     } catch {
-      setError("Network error");
+      setError("Erreur réseau");
     }
   };
 
   const handleRegenerateKey = async (id: string, name: string) => {
-    if (!confirm(`Regenerate API key for "${name}"? The old key will stop working immediately.`)) return;
+    if (!confirm(`Regénérer la clé API pour "${name}" ? L'ancienne clé cessera de fonctionner immédiatement.`)) return;
     try {
       const res = await fetch(`/api/v1/devices/${id}`, {
         method: "PATCH",
@@ -157,7 +157,7 @@ export default function DevicesPage() {
         fetchDevices();
       }
     } catch {
-      setError("Network error");
+      setError("Erreur réseau");
     }
   };
 
@@ -166,8 +166,8 @@ export default function DevicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Devices & API Keys</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Manage GX devices and their access keys</p>
+          <h1 className="text-2xl font-bold text-white">Appareils & Clés API</h1>
+          <p className="text-gray-400 text-sm mt-0.5">Gérer les appareils GX et leurs clés d&apos;accès</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -177,7 +177,7 @@ export default function DevicesPage() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          New Device
+          Nouvel appareil
         </button>
       </div>
 
@@ -197,7 +197,7 @@ export default function DevicesPage() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-green-400 font-semibold text-sm mb-1">
-                ✅ API key for &ldquo;{newKeyResult.name}&rdquo; — save it now, it won&apos;t be shown again!
+                ✅ Clé API pour &ldquo;{newKeyResult.name}&rdquo; — sauvegardez-la maintenant, elle ne sera plus affichée !
               </p>
               <div className="flex items-center gap-3 mt-2">
                 <code className="bg-gray-900 border border-gray-700 px-3 py-1.5 rounded-lg text-sm font-mono text-green-300 break-all">
@@ -215,10 +215,10 @@ export default function DevicesPage() {
       {showForm && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-            <h2 className="text-lg font-bold text-white mb-4">Create New Device</h2>
+            <h2 className="text-lg font-bold text-white mb-4">Créer un nouvel appareil</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Name *</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">Nom *</label>
                 <input
                   type="text"
                   required
@@ -230,7 +230,7 @@ export default function DevicesPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Location</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">Emplacement</label>
                 <input
                   type="text"
                   value={newDevice.location}
@@ -258,14 +258,14 @@ export default function DevicesPage() {
                   onClick={() => { setShowForm(false); setError(""); }}
                   className="flex-1 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors text-sm"
                 >
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
                   className="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors text-sm font-medium"
                 >
-                  {creating ? "Creating..." : "Create & Get Key"}
+                  {creating ? "Création..." : "Créer & Obtenir la clé"}
                 </button>
               </div>
             </form>
@@ -283,7 +283,7 @@ export default function DevicesPage() {
         </div>
       ) : devices.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-gray-700 rounded-2xl">
-          <p className="text-gray-400">No devices yet. Create one above.</p>
+          <p className="text-gray-400">Aucun appareil. Créez-en un ci-dessus.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -304,17 +304,17 @@ export default function DevicesPage() {
                     />
                     <h3 className="font-semibold text-white truncate">{device.name}</h3>
                     {!device.isActive && (
-                      <span className="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Disabled</span>
+                      <span className="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Désactivé</span>
                     )}
                   </div>
                   {device.location && <p className="text-sm text-gray-400">{device.location}</p>}
                   {device.description && <p className="text-xs text-gray-500 mt-0.5">{device.description}</p>}
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
-                    <span>🔑 Key hint: <code className="text-gray-400">...{device.apiKeyHint}</code></span>
+                    <span>🔑 Indice clé : <code className="text-gray-400">...{device.apiKeyHint}</code></span>
                     {device.serial && <span>S/N: {device.serial}</span>}
                     <span>{device._count.snapshots.toLocaleString()} snapshots</span>
                     {device.lastSeenAt && (
-                      <span>Last seen: {formatDistanceToNow(new Date(device.lastSeenAt), { addSuffix: true })}</span>
+                      <span>Vu il y a : {formatDistanceToNow(new Date(device.lastSeenAt), { addSuffix: true })}</span>
                     )}
                   </div>
                 </div>
@@ -326,14 +326,14 @@ export default function DevicesPage() {
                     className="px-3 py-1.5 text-xs rounded-lg border transition-colors
                                border-gray-700 text-gray-400 hover:border-gray-600 hover:text-white"
                   >
-                    {device.isActive ? "Disable" : "Enable"}
+                    {device.isActive ? "Désactiver" : "Activer"}
                   </button>
                   <button
                     onClick={() => handleRegenerateKey(device.id, device.name)}
                     className="px-3 py-1.5 text-xs rounded-lg border border-gray-700 text-gray-400
                                hover:border-amber-500/50 hover:text-amber-400 transition-colors"
                   >
-                    Regen Key
+                    Regénérer clé
                   </button>
                   {deleteConfirm === device.id ? (
                     <>
@@ -341,13 +341,13 @@ export default function DevicesPage() {
                         onClick={() => handleDelete(device.id)}
                         className="px-3 py-1.5 text-xs rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors"
                       >
-                        Confirm
+                        Confirmer
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(null)}
                         className="px-3 py-1.5 text-xs rounded-lg border border-gray-700 text-gray-400 hover:text-white transition-colors"
                       >
-                        Cancel
+                        Annuler
                       </button>
                     </>
                   ) : (
@@ -356,7 +356,7 @@ export default function DevicesPage() {
                       className="px-3 py-1.5 text-xs rounded-lg border border-gray-700 text-gray-400
                                  hover:border-red-500/50 hover:text-red-400 transition-colors"
                     >
-                      Delete
+                      Supprimer
                     </button>
                   )}
                 </div>

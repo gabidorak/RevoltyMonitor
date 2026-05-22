@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "RevoltyMonitor",
-  description: "Battery monitoring dashboard for Victron GX / JK BMS",
+  description: "Tableau de bord de suivi batterie pour Victron GX / JK BMS",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="fr" className="dark">
       <body className={`${inter.className} bg-gray-950 text-gray-100 min-h-screen`}>
         {children}
       </body>
