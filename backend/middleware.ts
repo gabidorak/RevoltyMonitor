@@ -4,6 +4,9 @@ import { verifySessionToken } from "@/lib/auth";
 
 const PUBLIC_PATHS = ["/login", "/api/v1/ingest", "/api/v1/auth"];
 
+// Paths that require ADMIN role
+const ADMIN_ONLY_PATHS = ["/api/v1/users", "/users"];
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -34,6 +37,13 @@ export async function middleware(request: NextRequest) {
           { status: 401 }
         );
       }
+      // Check admin-only API routes
+      if (ADMIN_ONLY_PATHS.some((p) => pathname.startsWith(p)) && session.role !== "ADMIN") {
+        return NextResponse.json(
+          { success: false, error: "Forbidden — admin only" },
+          { status: 403 }
+        );
+      }
       return NextResponse.next();
     }
 
@@ -42,6 +52,13 @@ export async function middleware(request: NextRequest) {
     if (sessionCookie) {
       const session = await verifySessionToken(sessionCookie);
       if (session) {
+        // Check admin-only API routes
+        if (ADMIN_ONLY_PATHS.some((p) => pathname.startsWith(p)) && session.role !== "ADMIN") {
+          return NextResponse.json(
+            { success: false, error: "Forbidden — admin only" },
+            { status: 403 }
+          );
+        }
         return NextResponse.next();
       }
     }
@@ -60,6 +77,11 @@ export async function middleware(request: NextRequest) {
   const session = await verifySessionToken(sessionCookie);
   if (!session) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Check admin-only pages
+  if (ADMIN_ONLY_PATHS.some((p) => pathname.startsWith(p)) && session.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();

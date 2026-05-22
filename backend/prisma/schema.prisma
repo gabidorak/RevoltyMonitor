@@ -98,9 +98,16 @@ model BatterySnapshot {
   @@index([deviceId, timestamp], map: "snapshot_device_ts_asc_idx")
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model AdminUser {
-  id           String   @id @default(cuid())
-  username     String   @unique
+  id           String    @id @default(cuid())
+  username     String    @unique
   passwordHash String
-  createdAt    DateTime @default(now())
+  role         Role      @default(USER)
+  createdAt    DateTime  @default(now())
+  lastSeenAt   DateTime?
 }

@@ -27,7 +27,13 @@ export async function POST(req: NextRequest) {
       return error("Invalid credentials", 401);
     }
 
-    const token = await createSessionToken(user.id);
+    // Update lastSeenAt on login
+    await prisma.adminUser.update({
+      where: { id: user.id },
+      data: { lastSeenAt: new Date() },
+    });
+
+    const token = await createSessionToken(user.id, user.role);
 
     const response = ok({ token, message: "Logged in successfully" });
     response.cookies.set(COOKIE_NAME, token, {

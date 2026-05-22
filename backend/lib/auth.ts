@@ -30,8 +30,8 @@ export async function verifyApiKey(
   return bcrypt.compare(apiKey, hash);
 }
 
-export async function createSessionToken(userId: string): Promise<string> {
-  return new SignJWT({ sub: userId, role: "admin" })
+export async function createSessionToken(userId: string, role: string): Promise<string> {
+  return new SignJWT({ sub: userId, role })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_DURATION}s`)
