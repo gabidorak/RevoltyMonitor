@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Device {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  apiKeyHash  String    @unique
+  apiKeyHint  String    // Last 4 chars of key for display
+  serial      String?   // JK BMS serial (auto-detected)
+  location    String?   // Optional location label
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastSeenAt  DateTime?
+
+  snapshots   BatterySnapshot[]
+
+  @@index([apiKeyHash])
+}
+
+model BatterySnapshot {
+  id        BigInt   @id @default(autoincrement())
+  deviceId  String
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  timestamp DateTime @default(now())
+
+  // ── Pack level ──────────────────────────────────────────────
+  voltage           Float
+  current           Float
+  power             Float
+  temperature       Float?
+
+  // SOC
+  socBms            Float    // SOC reported by JK BMS
+  socEstimated      Float    // SOC from smart estimator (coulomb counting + OCV)
+
+  // SOH
+  sohBms            Float    // SOH reported by JK BMS (always 100% in practice)
+  sohEstimated      Float    // SOH from smart estimator (EMA)
+
+  // Capacity
+  capacity          Float?   // Remaining Ah (SOH-adjusted)
+  installedCapacity Float?   // Installed Ah from BMS
+
+  // Consumed
+  consumedAmphours  Float?
+
+  // ── Cell level (min/max from CAN, no individual cells available) ────
+  minCellVoltage    Float?
+  maxCellVoltage    Float?
+  cellVoltageDelta  Float?   // max - min (mV precision)
+  minCellVoltageId  String?  // e.g. "00::04"
+  maxCellVoltageId  String?  // e.g. "00::11"
+
+  // ── Temperature ────────────────────────────────────────────
+  minCellTemperature  Float?
+  maxCellTemperature  Float?
+  tempDelta           Float?
+  minTempCellId       String?
+  maxTempCellId       String?
+
+  // ── System ────────────────────────────────────────────────
+  modulesOnline    Int?
+  modulesOffline   Int?
+  chargedEnergy    Float?    // kWh cumulative
+  dischargedEnergy Float?    // kWh cumulative
+
+  // ── Estimator extra info ──────────────────────────────────
+  socBmsDelta       Float?   // socEstimated - socBms (drift tracking)
+  inDeadZone        Boolean?
+  restTimer         Int?
+  anchorSoc         Float?
+  anchorAh          Float?
+  lastSohSample     Float?
+
+  // ── Alarms ────────────────────────────────────────────────
+  alarmLowVoltage          Boolean @default(false)
+  alarmHighVoltage         Boolean @default(false)
+  alarmLowSoc              Boolean @default(false)
+  alarmCellImbalance       Boolean @default(false)
+  alarmHighTemperature     Boolean @default(false)
+  alarmLowTemperature      Boolean @default(false)
+  alarmHighCellVoltage     Boolean @default(false)
+  alarmInternalFailure     Boolean @default(false)
+  alarmChargeBlocked       Boolean @default(false)
+  alarmDischargeBlocked    Boolean @default(false)
+
+  @@index([deviceId, timestamp(sort: Desc)], map: "snapshot_device_ts_desc_idx")
+  @@index([deviceId, timestamp], map: "snapshot_device_ts_asc_idx")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
