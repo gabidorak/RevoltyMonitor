@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     const token = await createSessionToken(user.id);
 
-    const response = ok({ message: "Logged in successfully" });
+    const response = ok({ token, message: "Logged in successfully" });
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -38,8 +38,7 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    // Also return token in body for API usage
-    return ok({ token, message: "Logged in successfully" });
+    return response;
   } catch (e) {
     console.error("Login error:", e);
     return serverError();
