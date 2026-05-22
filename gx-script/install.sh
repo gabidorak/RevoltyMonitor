@@ -8,7 +8,7 @@
 set -e
 
 INSTALL_DIR="/data/revoltymonitor"
-GITHUB_RAW="https://raw.githubusercontent.com/gabidorak/RevoltyMonitorBackend/main/gx-script"
+GITHUB_RAW="https://raw.githubusercontent.com/gabidorak/RevoltyMonitor/main/gx-script"
 SCRIPT_NAME="revolty_monitor.py"
 SERVICE_NAME="revolty_monitor"
 

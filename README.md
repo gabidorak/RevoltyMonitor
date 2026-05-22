@@ -85,7 +85,7 @@ Set environment variables in the Vercel dashboard:
 ssh root@<gx-ip>
 
 # One-line install
-curl -sSL https://raw.githubusercontent.com/gabidorak/RevoltyMonitorBackend/main/gx-script/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/gabidorak/RevoltyMonitor/main/gx-script/install.sh | bash
 ```
 
 Then configure:
