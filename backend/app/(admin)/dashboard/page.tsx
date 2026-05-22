@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
+export const dynamic = "force-dynamic";
+
 async function getDevicesWithLatest() {
   const devices = await prisma.device.findMany({
     orderBy: { createdAt: "desc" },
