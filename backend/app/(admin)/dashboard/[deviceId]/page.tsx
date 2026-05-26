@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -102,6 +102,15 @@ const TIME_RANGES = [
   { label: "30d", hours: 24 * 30 },
 ];
 
+/** How often the live chart data refreshes (ms) */
+const DATA_POLL_MS = 30_000;
+
+/**
+ * How often the heavy stats aggregates refresh (ms).
+ * Must match STATS_TTL_MS in lib/stats-cache.ts so cache and polling are aligned.
+ */
+const STATS_POLL_MS = 5 * 60 * 1000;
+
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function StatBox({
@@ -182,9 +191,11 @@ export default function DeviceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError("");
+  // Track when stats were last fetched so we know whether to refresh them
+  const lastStatsFetchRef = useRef<number>(0);
+
+  // ── Fetch chart data (live, every 30 s) ────────────────────────────────
+  const fetchChartData = useCallback(async () => {
     try {
       const now = new Date();
       const from =
@@ -192,40 +203,67 @@ export default function DeviceDetailPage() {
           ? subDays(now, timeRange / 24)
           : subHours(now, timeRange);
 
-      const [dataRes, statsRes] = await Promise.all([
-        fetch(
-          `/api/v1/data/${deviceId}?from=${from.toISOString()}&to=${now.toISOString()}&downsample=true&limit=500`,
-          { credentials: "include" }
-        ),
-        fetch(
-          `/api/v1/stats/${deviceId}?from=${subDays(now, 30).toISOString()}&to=${now.toISOString()}`,
-          { credentials: "include" }
-        ),
-      ]);
+      const res = await fetch(
+        `/api/v1/data/${deviceId}?from=${from.toISOString()}&to=${now.toISOString()}&downsample=true&limit=500`,
+        { credentials: "include" }
+      );
 
-      if (dataRes.status === 401 || statsRes.status === 401) {
-        router.push("/login");
-        return;
-      }
+      if (res.status === 401) { router.push("/login"); return; }
 
-      const dataJson = await dataRes.json();
-      const statsJson = await statsRes.json();
-
-      if (dataJson.success) setChartData(dataJson.data.data || []);
-      if (statsJson.success) setStats(statsJson.data);
-      else setError(statsJson.error || "Échec du chargement des statistiques");
+      const json = await res.json();
+      if (json.success) setChartData(json.data.data || []);
     } catch {
-      setError("Erreur réseau");
-    } finally {
-      setLoading(false);
+      // network hiccup — keep old data
     }
   }, [deviceId, timeRange, router]);
 
+  // ── Fetch stats aggregates (heavy, every 5 min) ─────────────────────────
+  const fetchStats = useCallback(async () => {
+    try {
+      const now = new Date();
+      const res = await fetch(
+        `/api/v1/stats/${deviceId}?from=${subDays(now, 30).toISOString()}&to=${now.toISOString()}`,
+        { credentials: "include" }
+      );
+
+      if (res.status === 401) { router.push("/login"); return; }
+
+      const json = await res.json();
+      if (json.success) {
+        setStats(json.data);
+        lastStatsFetchRef.current = Date.now();
+      } else {
+        setError(json.error || "Échec du chargement des statistiques");
+      }
+    } catch {
+      setError("Erreur réseau");
+    }
+  }, [deviceId, router]);
+
+  // ── Initial load — fetch everything at once ─────────────────────────────
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 30_000); // refresh every 30s
-    return () => clearInterval(interval);
-  }, [fetchData]);
+    setLoading(true);
+    setError("");
+
+    Promise.all([fetchChartData(), fetchStats()]).finally(() =>
+      setLoading(false)
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deviceId, timeRange]); // re-run when device or time range changes
+
+  // ── Data poll — every 30 s ──────────────────────────────────────────────
+  useEffect(() => {
+    const id = setInterval(async () => {
+      await fetchChartData();
+
+      // Piggyback stats refresh if the TTL has expired
+      if (Date.now() - lastStatsFetchRef.current >= STATS_POLL_MS) {
+        await fetchStats();
+      }
+    }, DATA_POLL_MS);
+
+    return () => clearInterval(id);
+  }, [fetchChartData, fetchStats]);
 
   // Prepare chart data (add computed mV delta)
   const prepared = chartData.map((s) => ({
