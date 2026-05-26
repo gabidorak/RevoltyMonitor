@@ -90,10 +90,6 @@ const CHART_COLOR = {
   gray: "#6b7280",
 };
 
-function fmt(ts: string) {
-  return format(new Date(ts), "HH:mm");
-}
-
 const TIME_RANGES = [
   { label: "1h", hours: 1 },
   { label: "6h", hours: 6 },
@@ -165,9 +161,13 @@ const CustomTooltip = ({
   label?: string;
 }) => {
   if (!active || !payload || !payload.length) return null;
+  // label is an ISO timestamp string; format it for display
+  const displayLabel = label
+    ? (() => { try { return format(new Date(label), "HH:mm"); } catch { return label; } })()
+    : "";
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs shadow-xl">
-      <p className="text-gray-400 mb-1">{label}</p>
+      <p className="text-gray-400 mb-1">{displayLabel}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color }}>
           {p.name}: <span className="font-bold">{p.value?.toFixed ? p.value.toFixed(2) : p.value}</span>
@@ -268,7 +268,6 @@ export default function DeviceDetailPage() {
   // Prepare chart data (add computed mV delta)
   const prepared = chartData.map((s) => ({
     ...s,
-    ts: fmt(s.timestamp),
     cellDeltaMv:
       s.cellVoltageDelta != null
         ? Math.round(s.cellVoltageDelta * 1000)
@@ -413,7 +412,7 @@ export default function DeviceDetailPage() {
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={prepared}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                <XAxis dataKey="ts" tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
+                <XAxis dataKey="timestamp" tickFormatter={(ts: string) => { try { return format(new Date(ts), "HH:mm"); } catch { return ts; } }} tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
                 <YAxis domain={[0, 100]} tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} unit="%" />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
@@ -428,7 +427,7 @@ export default function DeviceDetailPage() {
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={prepared}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                <XAxis dataKey="ts" tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
+                <XAxis dataKey="timestamp" tickFormatter={(ts: string) => { try { return format(new Date(ts), "HH:mm"); } catch { return ts; } }} tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
                 <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} unit="mV" />
                 <Tooltip content={<CustomTooltip />} />
                 <ReferenceLine y={50} stroke={CHART_COLOR.amber} strokeDasharray="4 2" label={{ value: "50mV", fill: "#fbbf24", fontSize: 10 }} />
@@ -442,7 +441,7 @@ export default function DeviceDetailPage() {
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={prepared}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                <XAxis dataKey="ts" tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
+                <XAxis dataKey="timestamp" tickFormatter={(ts: string) => { try { return format(new Date(ts), "HH:mm"); } catch { return ts; } }} tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
                 <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} unit="mV" domain={["auto", "auto"]} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
@@ -458,7 +457,7 @@ export default function DeviceDetailPage() {
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={prepared}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis dataKey="ts" tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
+                  <XAxis dataKey="timestamp" tickFormatter={(ts: string) => { try { return format(new Date(ts), "HH:mm"); } catch { return ts; } }} tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
                   <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} unit="°C" />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
@@ -473,7 +472,7 @@ export default function DeviceDetailPage() {
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={prepared}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis dataKey="ts" tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
+                  <XAxis dataKey="timestamp" tickFormatter={(ts: string) => { try { return format(new Date(ts), "HH:mm"); } catch { return ts; } }} tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} />
                   <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} tickLine={false} unit="W" />
                   <Tooltip content={<CustomTooltip />} />
                   <ReferenceLine y={0} stroke="#374151" />
