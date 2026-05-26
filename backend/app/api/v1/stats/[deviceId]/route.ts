@@ -111,7 +111,12 @@ export async function GET(req: NextRequest, { params }: Params) {
     const toRounded = new Date(
       Math.floor(to.getTime() / STATS_TTL_MS) * STATS_TTL_MS
     );
-    const cacheKey = `stats:${deviceId}:${from.toISOString()}:${toRounded.toISOString()}`;
+    // Round `from` to the same 5-min bucket so the key stays stable across
+    // requests that compute `from = now - 30d` with slightly different `now`.
+    const fromRounded = new Date(
+      Math.floor(from.getTime() / STATS_TTL_MS) * STATS_TTL_MS
+    );
+    const cacheKey = `stats:${deviceId}:${fromRounded.toISOString()}:${toRounded.toISOString()}`;
 
     type HeavyAggregates = {
       totalCount: number;
@@ -215,7 +220,7 @@ export async function GET(req: NextRequest, { params }: Params) {
               AND  timestamp <= ${to}
               AND  "minCellVoltageId" IS NOT NULL
             GROUP  BY "minCellVoltageId"
-            ORDER  BY cnt DESC
+            ORDER  BY COUNT(*) DESC
             LIMIT  5
           `,
           prisma.$queryRaw<CellFreqRow[]>`
@@ -226,7 +231,7 @@ export async function GET(req: NextRequest, { params }: Params) {
               AND  timestamp <= ${to}
               AND  "maxCellVoltageId" IS NOT NULL
             GROUP  BY "maxCellVoltageId"
-            ORDER  BY cnt DESC
+            ORDER  BY COUNT(*) DESC
             LIMIT  5
           `,
         ]);

@@ -493,9 +493,9 @@ export default function DeviceDetailPage() {
               🔴 Cellules les plus déséquilibrées (30 jours)
             </h3>
             <div className="space-y-3">
-              <div>
-                <p className="text-xs text-gray-500 mb-2">Souvent en position MIN (déchargée)</p>
-                {stats.cellImbalance.mostFrequentMin.map((c) => (
+                <div>
+                  <p className="text-xs text-gray-500 mb-2">Souvent en position MIN (déchargée)</p>
+                  {[...stats.cellImbalance.mostFrequentMin].sort((a, b) => b.pct - a.pct).map((c) => (
                   <div key={c.cellId} className="flex items-center gap-3 mb-1.5">
                     <span className="text-xs font-mono text-blue-400 w-14">{c.cellId}</span>
                     <div className="flex-1 bg-gray-800 rounded-full h-2">
@@ -508,9 +508,9 @@ export default function DeviceDetailPage() {
                   </div>
                 ))}
               </div>
-              <div className="pt-2 border-t border-gray-800">
-                <p className="text-xs text-gray-500 mb-2">Souvent en position MAX (chargée en premier)</p>
-                {stats.cellImbalance.mostFrequentMax.map((c) => (
+                <div className="pt-2 border-t border-gray-800">
+                  <p className="text-xs text-gray-500 mb-2">Souvent en position MAX (chargée en premier)</p>
+                  {[...stats.cellImbalance.mostFrequentMax].sort((a, b) => b.pct - a.pct).map((c) => (
                   <div key={c.cellId} className="flex items-center gap-3 mb-1.5">
                     <span className="text-xs font-mono text-orange-400 w-14">{c.cellId}</span>
                     <div className="flex-1 bg-gray-800 rounded-full h-2">
